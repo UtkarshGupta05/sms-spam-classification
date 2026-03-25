@@ -3,18 +3,30 @@ import pickle
 import string
 from nltk.corpus import stopwords
 import nltk
+import os
+import shutil
+
 from nltk.stem.porter import PorterStemmer
 
+nltk_path = os.path.join(os.getcwd(), 'nltk_data')
+os.environ["NLTK_DATA"] = nltk_path
+nltk.data.path.append(nltk_path)
 
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+def force_download_nltk():
+    # Remove corrupted punkt if any
+    punkt_dir = os.path.join(nltk_path, 'tokenizers', 'punkt')
+    if os.path.exists(punkt_dir):
+        shutil.rmtree(punkt_dir, ignore_errors=True)
 
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+    nltk.download('punkt', download_dir=nltk_path, force=True)
+    nltk.download('punkt_tab', download_dir=nltk_path, force=True)
+    nltk.download('stopwords', download_dir=nltk_path, force=True)
+
+force_download_nltk()
+
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
 
 ps = PorterStemmer()
 def transform_text(text):
